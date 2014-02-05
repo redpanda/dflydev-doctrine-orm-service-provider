@@ -19,6 +19,7 @@ use Doctrine\Common\Cache\MemcacheCache;
 use Doctrine\Common\Cache\MemcachedCache;
 use Doctrine\Common\Cache\XcacheCache;
 use Doctrine\Common\Cache\RedisCache;
+use Doctrine\Common\Cache\ZendDataCache;
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriver;
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\DBAL\Types\Type;
@@ -284,6 +285,10 @@ class DoctrineOrmServiceProvider
             return new XcacheCache;
         });
 
+        $app['orm.cache.factory.zend_data'] = $app->protect(function() {
+            return new ZendDataCache;
+        });
+
         $app['orm.cache.factory.filesystem'] = $app->protect(function($cacheOptions) {
             if (empty($cacheOptions['path'])) {
                 throw new \RuntimeException('FilesystemCache path not defined');
@@ -299,6 +304,8 @@ class DoctrineOrmServiceProvider
                     return $app['orm.cache.factory.apc']();
                 case 'xcache':
                     return $app['orm.cache.factory.xcache']();
+                case 'zend_data':
+                    return $app['orm.cache.factory.zend_data']();
                 case 'memcache':
                     return $app['orm.cache.factory.memcache']($cacheOptions);
                 case 'memcached':
